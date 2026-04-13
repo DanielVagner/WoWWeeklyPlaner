@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "logo": "WoW Planner",
+    "season": "Midnight · Season 1",
+    "logout": "Sign out",
+    "manageCharsHint": "Click a character to toggle tracking",
+    "chars": "Chars"
+  },
+  "characters": {
+    "title": "My Characters",
+    "hint": "Star the characters you want to track on the dashboard.",
+    "empty": "No characters found. Click 'Sync characters' on the dashboard to load your Battle.net roster.",
+    "sectionTracked": "On dashboard",
+    "sectionAll": "Not tracked"
+  },
+  "reset": {
+    "days": "{days}d {hours}h until reset",
+    "hours": "{hours}h {mins}m until reset",
+    "mins": "{mins}m until reset"
+  },
+  "landing": {
+    "headline1": "Know exactly",
+    "headline2": "what to do this week.",
+    "subtitle": "Personalized planner generated directly from your character data. Vault thresholds, M+ prioritization, and crafting profit – all in one place.",
+    "loginButton": "Sign in with Battle.net",
+    "disclaimer": "Securely signed in via Blizzard OAuth. We only read character profile data.",
+    "footer": "Not affiliated with Blizzard Entertainment or World of Warcraft.",
+    "features": {
+      "vault":     { "title": "Vault Tracker",    "description": "Clear visualization of all 9 Vault slots. M+, Raid, Delve – know exactly what's missing." },
+      "priority":  { "title": "Priority Engine",  "description": "Algorithm calculates the nearest Vault threshold and sorts tasks by actual ilvl impact." },
+      "multichar": { "title": "Multi-char",        "description": "All characters on the account on one dashboard. Switch with one click." }
+    }
+  },
+  "dashboard": {
+    "greeting":     "Hi, {name}",
+    "syncButton":   "Sync characters",
+    "refreshButton":"Update",
+    "syncing":      "Syncing…",
+    "empty": {
+      "title":       "No characters",
+      "description": "Click 'Sync characters' above to load all your characters from your Battle.net account."
+    },
+    "noTracked": {
+      "title":       "No tracked characters",
+      "description": "Click your username in the top-right corner to open the character panel and star the characters you want to track."
+    }
+  },
+  "character": {
+    "backLink":        "← All characters",
+    "neverSynced":     "Never synced – download data from Blizzard API",
+    "syncedAt":        "Synced {date}",
+    "syncButton":      "↻ Sync",
+    "syncing":         "Syncing…"
+  },
+  "planner": {
+    "vault": {
+      "sectionTitle": "Great Vault",
+      "allUnlocked":  "All slots unlocked ✓",
+      "progress":     "{done}/{threshold} – {missing} remaining"
+    },
+    "delves": {
+      "sectionTitle": "Tier 8+ Delves this week"
+    },
+    "priorities": {
+      "sectionTitle": "Recommendations for this week",
+      "mp-vault-slot": {
+        "title":  "{count}× M+ run",
+        "reason": "Unlock next Vault slot ({ilvl} ilvl). You are {gap} ilvl below Heroic cap – every slot counts."
+      },
+      "mp-key-push": {
+        "title":  "Push to +{level}",
+        "reason": "+{gain} ilvl in Vault for one extra run."
+      },
+      "raid-vault-slot": {
+        "title":  "Heroic raid – {count}× boss",
+        "reason": "{count} boss(es) remaining for next Raid Vault slot (623 ilvl)."
+      },
+      "delve-vault-slot": {
+        "title":  "{count}× Tier 8+ Delve",
+        "reason": "Quick content, unlocks Delve Vault slot (616 ilvl)."
+      },
+      "crafting-cooldowns": {
+        "title":  "Crafting cooldowns",
+        "reason": "Check Alchemy and Enchanting weekly CD. Flasks and enchants always sell."
+      },
+      "rewards": {
+        "vault":        "{ilvl} ilvl vault",
+        "vaultUpgrade": "+{gain} ilvl vault",
+        "drop":         "drop",
+        "gold":         "🪙 {estimate}"
+      }
+    }
+  },
+  "vault": {
+    "mp":    "Mythic+",
+    "raid":  "Raid",
+    "delve": "Delve"
+  }
+}

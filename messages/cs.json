@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "logo": "WoW Planner",
+    "season": "Midnight · Sezona 1",
+    "logout": "Odhlásit",
+    "manageCharsHint": "Klikni na postavu pro přepnutí sledování",
+    "chars": "Postavy"
+  },
+  "characters": {
+    "title": "Moje postavy",
+    "hint": "Hvězdičkou označ postavy, které chceš sledovat na dashboardu.",
+    "empty": "Žádné postavy nenalezeny. Klikni na 'Sync postav' na dashboardu a načti svůj Battle.net roster.",
+    "sectionTracked": "Na dashboardu",
+    "sectionAll": "Nesledované"
+  },
+  "reset": {
+    "days": "{days}d {hours}h do resetu",
+    "hours": "{hours}h {mins}m do resetu",
+    "mins": "{mins}m do resetu"
+  },
+  "landing": {
+    "headline1": "Vědět přesně,",
+    "headline2": "co dělat tento týden.",
+    "subtitle": "Personalizovaný planner generovaný přímo z dat tvých postav. Vault thresholdy, M+ prioritizace a crafting profit – vše na jednom místě.",
+    "loginButton": "Přihlásit se přes Battle.net",
+    "disclaimer": "Přihlásí se bezpečně přes Blizzard OAuth. Přistupujeme pouze ke čtení profilových dat postav.",
+    "footer": "Není součástí Blizzard Entertainment ani World of Warcraft.",
+    "features": {
+      "vault":     { "title": "Vault Tracker",   "description": "Přehledná vizualizace všech 9 Vault slotů. M+, Raid, Delve – víš přesně, co ti ještě chybí." },
+      "priority":  { "title": "Priority Engine", "description": "Algoritmus spočítá nejbližší Vault threshold a seřadí úkoly podle skutečného dopadu na ilvl." },
+      "multichar": { "title": "Multi-char",       "description": "Všechny postavy na účtu na jednom dashboardu. Přepínáš jedním kliknutím." }
+    }
+  },
+  "dashboard": {
+    "greeting":     "Ahoj, {name}",
+    "syncButton":   "Sync postav",
+    "refreshButton":"Aktualizovat",
+    "syncing":      "Synchronizuji…",
+    "empty": {
+      "title":       "Žádné postavy",
+      "description": "Klikni na 'Sync postav' výše a načteme všechny tvoje postavy z Battle.net účtu."
+    },
+    "noTracked": {
+      "title":       "Žádné sledované postavy",
+      "description": "Klikni na své jméno vpravo nahoře, otevře se panel postav – označ hvězdičkou ty, které chceš sledovat."
+    }
+  },
+  "character": {
+    "backLink":    "← Všechny postavy",
+    "neverSynced": "Nikdy nesynced – stáhni data z Blizzard API",
+    "syncedAt":    "Synced {date}",
+    "syncButton":  "↻ Sync",
+    "syncing":     "Synchronizuji…"
+  },
+  "planner": {
+    "vault": {
+      "sectionTitle": "Great Vault",
+      "allUnlocked":  "Všechny sloty odemčeny ✓",
+      "progress":     "{done}/{threshold} – chybí {missing}"
+    },
+    "delves": {
+      "sectionTitle": "Tier 8+ Delves tento týden"
+    },
+    "priorities": {
+      "sectionTitle": "Doporučení pro tento týden",
+      "mp-vault-slot": {
+        "title":  "{count}× M+ run",
+        "reason": "Odemkneš další Vault slot ({ilvl} ilvl). Jsi {gap} ilvl pod Heroic capem – každý slot se počítá."
+      },
+      "mp-key-push": {
+        "title":  "Push na +{level}",
+        "reason": "+{gain} ilvl ve Vault za jeden run navíc."
+      },
+      "raid-vault-slot": {
+        "title":  "Heroic raid – {count}× boss",
+        "reason": "Do dalšího Raid Vault slotu (623 ilvl) chybí {count} bossů."
+      },
+      "delve-vault-slot": {
+        "title":  "{count}× Tier 8+ Delve",
+        "reason": "Časově nenáročné, odemkne Delve Vault slot (616 ilvl)."
+      },
+      "crafting-cooldowns": {
+        "title":  "Crafting cooldowny",
+        "reason": "Zkontroluj Alchemy a Enchanting weekly CD. Flasks a enchants se vždy prodají."
+      },
+      "rewards": {
+        "vault":        "{ilvl} ilvl vault",
+        "vaultUpgrade": "+{gain} ilvl vault",
+        "drop":         "drop",
+        "gold":         "🪙 {estimate}"
+      }
+    }
+  },
+  "vault": {
+    "mp":    "Mythic+",
+    "raid":  "Raid",
+    "delve": "Delve"
+  }
+}
