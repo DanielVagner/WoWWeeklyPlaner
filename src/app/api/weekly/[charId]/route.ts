@@ -41,7 +41,7 @@ export async function PUT(req: Request, { params }: Params) {
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { charId } = await params
-  const body       = await req.json() as { delvesDone?: number; tasksDone?: string[] }
+  const body       = await req.json() as { mpRunsDone?: number; delvesDone?: number; tasksDone?: string[] }
 
   const character = await db.character.findFirst({
     where: { id: charId, userId: session.user.id },
@@ -55,15 +55,16 @@ export async function PUT(req: Request, { params }: Params) {
     create: {
       characterId:    charId,
       weekStart,
-      mpRunsDone:     0,
+      mpRunsDone:     body.mpRunsDone  ?? 0,
       mpHighestKey:   0,
       raidBossesDone: 0,
-      delvesDone:     body.delvesDone ?? 0,
+      delvesDone:     body.delvesDone  ?? 0,
       tasksDone:      stringifyTasks(body.tasksDone ?? []),
     },
     update: {
-      ...(body.delvesDone !== undefined && { delvesDone: body.delvesDone }),
-      ...(body.tasksDone  !== undefined && { tasksDone:  stringifyTasks(body.tasksDone) }),
+      ...(body.mpRunsDone  !== undefined && { mpRunsDone:  body.mpRunsDone }),
+      ...(body.delvesDone  !== undefined && { delvesDone:  body.delvesDone }),
+      ...(body.tasksDone   !== undefined && { tasksDone:   stringifyTasks(body.tasksDone) }),
     },
   })
 

@@ -58,6 +58,10 @@
       "allUnlocked":  "All slots unlocked ✓",
       "progress":     "{done}/{threshold} – {missing} remaining"
     },
+    "mp": {
+      "sectionTitle": "Mythic+ runs this week",
+      "highestKey":   "Highest key: +{key}"
+    },
     "delves": {
       "sectionTitle": "Tier 8+ Delves this week"
     },

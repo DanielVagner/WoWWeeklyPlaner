@@ -23,11 +23,12 @@ export function WeeklyPlanner({ character, weeklyState: initialState }: WeeklyPl
 
   const mpRunsDone     = state?.mpRunsDone     ?? 0
   const mpHighestKey   = state?.mpHighestKey   ?? 0
+  const mpTopKeys      = state?.mpTopKeys      ?? '[]'
   const raidBossesDone = state?.raidBossesDone ?? 0
   const delvesDone     = state?.delvesDone     ?? 0
   const tasksDone      = parseTasks(state?.tasksDone ?? '[]')
 
-  const vault      = buildVaultState(mpRunsDone, mpHighestKey, raidBossesDone, delvesDone)
+  const vault      = buildVaultState(mpRunsDone, mpHighestKey, mpTopKeys, raidBossesDone, delvesDone)
   const priorities = generatePriorities({
     avgIlvl: character.avgIlvl,
     mpRunsDone,
@@ -42,16 +43,6 @@ export function WeeklyPlanner({ character, weeklyState: initialState }: WeeklyPl
       if (!res.ok) return
       const data = await res.json()
       setState(data.weeklyState)
-    })
-  }
-
-  async function updateDelves(value: number) {
-    const next = Math.max(0, Math.min(8, value))
-    setState((prev) => prev ? { ...prev, delvesDone: next } : null)
-    await fetch(`/api/weekly/${character.id}`, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ delvesDone: next }),
     })
   }
 
@@ -75,30 +66,6 @@ export function WeeklyPlanner({ character, weeklyState: initialState }: WeeklyPl
           {t('planner.vault.sectionTitle')}
         </h2>
         <VaultTracker mp={vault.mp} raid={vault.raid} delve={vault.delve} />
-      </section>
-
-      {/* Delve counter (manuální) */}
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-medium text-wow-muted uppercase tracking-wider">
-            {t('planner.delves.sectionTitle')}
-          </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => updateDelves(delvesDone - 1)}
-              className="w-7 h-7 rounded-lg bg-wow-surface-2 border border-wow-border text-wow-text hover:border-wow-gold/40 transition-colors text-sm"
-            >
-              −
-            </button>
-            <span className="text-wow-text font-semibold w-4 text-center">{delvesDone}</span>
-            <button
-              onClick={() => updateDelves(delvesDone + 1)}
-              className="w-7 h-7 rounded-lg bg-wow-surface-2 border border-wow-border text-wow-text hover:border-wow-gold/40 transition-colors text-sm"
-            >
-              +
-            </button>
-          </div>
-        </div>
       </section>
 
       {/* Priority list */}

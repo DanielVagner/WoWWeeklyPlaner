@@ -3,16 +3,26 @@
 import { useSession, signOut } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { LanguageSwitcher } from './LanguageSwitcher'
 import { getTimeUntilReset } from '@/lib/reset'
 
-function ResetCountdown() {
-  const t = useTranslations('reset')
-  const { days, hours, mins } = getTimeUntilReset()
+function formatCountdown(t: ReturnType<typeof useTranslations<'reset'>>, { days, hours, mins }: { days: number; hours: number; mins: number }) {
+  if (days > 0)  return t('days',  { days, hours })
+  if (hours > 0) return t('hours', { hours, mins })
+  return t('mins', { mins })
+}
 
-  if (days > 0)  return <span>{t('days',  { days, hours })}</span>
-  if (hours > 0) return <span>{t('hours', { hours, mins })}</span>
-  return              <span>{t('mins',  { mins })}</span>
+function ResetCountdown() {
+  const t  = useTranslations('reset')
+  const eu = getTimeUntilReset('eu')
+  const na = getTimeUntilReset('us')
+
+  return (
+    <span className="flex items-center gap-2">
+      <span title="EU reset (Wed 04:00 UTC)">EU {formatCountdown(t, eu)}</span>
+      <span className="text-wow-border">·</span>
+      <span title="NA reset (Tue 15:00 UTC)">NA {formatCountdown(t, na)}</span>
+    </span>
+  )
 }
 
 export function Header() {
@@ -45,9 +55,7 @@ export function Header() {
             <ResetCountdown />
           </span>
 
-          <LanguageSwitcher />
-
-          {session?.user && (
+{session?.user && (
             <div className="flex items-center gap-3">
               <span className="text-xs text-wow-muted hidden sm:block">
                 {session.user.name?.split('#')[0] ?? session.user.email ?? '?'}

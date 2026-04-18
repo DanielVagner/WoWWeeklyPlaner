@@ -6,7 +6,7 @@ import { db } from '@/lib/db'
 import { Header } from '@/components/layout/Header'
 import { CharacterCard } from '@/components/character/CharacterCard'
 import { SyncCharactersButton } from './SyncCharactersButton'
-import { AutoSync, STALE_SECS } from './AutoSync'
+import { AutoSync } from './AutoSync'
 import { getCurrentWeekStart } from '@/lib/reset'
 import { totalVaultSlots } from '@/lib/vault'
 
@@ -28,13 +28,7 @@ export default async function DashboardPage({ params }: Props) {
   const totalChars = await db.character.count({ where: { userId: session.user.id } })
 
   const firstName  = session.user.name?.split('#')[0] ?? ''
-  const nowMs      = Date.now()
-  const staleIds   = characters
-    .filter((c) => {
-      if (!c.lastSyncedAt) return true
-      return (nowMs - new Date(c.lastSyncedAt).getTime()) / 1000 > STALE_SECS
-    })
-    .map((c) => c.id)
+  const staleIds = characters.map((c) => c.id)
 
   return (
     <div className="min-h-dvh flex flex-col bg-wow-bg">

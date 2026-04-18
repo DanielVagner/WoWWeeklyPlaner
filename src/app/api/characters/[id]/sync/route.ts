@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { fetchCharacterProfile, fetchMythicProfile, fetchRaidEncounters, fetchCharacterDelves } from '@/lib/blizzard/client'
-import { getCurrentWeekStart, isAfterLastReset } from '@/lib/reset'
+import { fetchCharacterProfile, fetchMythicProfile, fetchRaidEncounters, fetchCharacterDelves, fetchRaiderIOWeeklyRuns } from '@/lib/blizzard/client'
+import { getWeekStart, isAfterLastReset } from '@/lib/reset'
 
 interface Params { params: Promise<{ id: string }> }
 
 // POST /api/characters/[id]/sync – synchronizuje data postavy + týdenní stav
 export async function POST(_req: Request, { params }: Params) {
+  try {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -30,13 +31,24 @@ export async function POST(_req: Request, { params }: Params) {
   const realm     = character.realmSlug
   const name      = character.name
 
-  // Paralelní fetch – profil, M+, raid encounters, delves
-  const [profileResult, mythicResult, raidResult, delvesResult] = await Promise.allSettled([
+  // Paralelní fetch – profil, M+, raid encounters, delves + Raider.IO weekly runs
+  const [profileResult, mythicResult, raidResult, delvesResult, raiderIOResult] = await Promise.allSettled([
     fetchCharacterProfile(realm, name, token),
     fetchMythicProfile(realm, name, token),
     fetchRaidEncounters(realm, name, token),
     fetchCharacterDelves(realm, name, token),
+    fetchRaiderIOWeeklyRuns(character.region, realm, name),
   ])
+
+  // Pokud všechny Blizzard volání selhala s 401, token expiroval → user se musí přihlásit znovu
+  const blizzardResults = [profileResult, mythicResult, raidResult, delvesResult]
+  const allFailed       = blizzardResults.every((r) => r.status === 'rejected')
+  const anyUnauthorized = blizzardResults.some(
+    (r) => r.status === 'rejected' && String((r as PromiseRejectedResult).reason).includes('401')
+  )
+  if (allFailed && anyUnauthorized) {
+    return NextResponse.json({ error: 'Battle.net token expired – please sign in again' }, { status: 401 })
+  }
 
   // --- Update character profilu ---
   const profile = profileResult.status === 'fulfilled' ? profileResult.value : null
@@ -54,19 +66,31 @@ export async function POST(_req: Request, { params }: Params) {
 
   // --- M+ statistiky pro tento týden ---
   const mythic      = mythicResult.status === 'fulfilled' ? mythicResult.value : null
-  const weekStartMs = getCurrentWeekStart().getTime()
+  const weekStartMs = getWeekStart(character.region).getTime()
 
-  // Preferujeme current_period runs; pokud API nevrátí (beta / off-season),
-  // filtrujeme season best_runs podle timestampu aktuálního resetu.
-  const currentPeriodRuns =
-    mythic?.current_period?.best_runs ??
-    (mythic?.best_runs ?? []).filter((r) => r.completed_timestamp >= weekStartMs)
+  // Počet runů: Raider.IO vrací všechny runy toho týdne (včetně opakování stejného dungeonu).
+  // Blizzard current_period.best_runs vrací jen best-per-dungeon → podhodnocuje vault count.
+  const raiderIO       = raiderIOResult.status === 'fulfilled' ? raiderIOResult.value : null
+  const raiderIORuns   = raiderIO?.mythic_plus_weekly_highest_level_runs ?? []
 
-  const mpRunsDone   = currentPeriodRuns.length
-  const mpHighestKey = currentPeriodRuns.reduce(
-    (max, r) => Math.max(max, r.keystone_level),
-    0
-  )
+  // Highest key: z Blizzard season best_runs nebo Raider.IO weekly runs
+  const periodRuns = mythic?.current_period?.best_runs
+  const blizzardRuns =
+    periodRuns && periodRuns.length > 0
+      ? periodRuns
+      : (mythic?.best_runs ?? []).filter((r) => r.completed_timestamp >= weekStartMs)
+
+  // Raider.IO returns runs sorted highest → lowest; take top 8 for vault slot calculation
+  const sortedKeys   = raiderIORuns.map((r) => r.mythic_level)
+  const mpTopKeys    = JSON.stringify(sortedKeys.slice(0, 8))
+
+  const mpRunsDone   = raiderIORuns.length > 0
+    ? raiderIORuns.length
+    : blizzardRuns.length
+
+  const mpHighestKey = sortedKeys.length > 0
+    ? sortedKeys[0]
+    : blizzardRuns.reduce((max, r) => Math.max(max, r.keystone_level), 0)
 
   // --- Raid bossi tento týden ---
   // Prohledáme VŠECHNY expanze (WoW Midnight nemusí být poslední v poli).
@@ -115,15 +139,18 @@ export async function POST(_req: Request, { params }: Params) {
   }
 
   // --- Upsert WeeklyState ---
-  const weekStart = getCurrentWeekStart()
+  const weekStart = getWeekStart(character.region)
 
-  // Existující stav – potřebujeme zachovat ruční delvesDone pokud API nevrátí data
+  // Existující stav – zachováme ruční hodnoty pokud jsou vyšší než API data.
+  // Blizzard API vrací jen best-run-per-dungeon pro M+, takže může podhodnotit
+  // celkový počet runů. Pokud uživatel zadal víc ručně, nebudeme to přemazat.
   const existingState = await db.weeklyState.findUnique({
     where: { characterId_weekStart: { characterId: id, weekStart } },
-    select: { delvesDone: true },
+    select: { delvesDone: true, mpRunsDone: true },
   })
 
   const finalDelvesDone = delvesDone ?? existingState?.delvesDone ?? 0
+  const finalMpRunsDone = Math.max(mpRunsDone, existingState?.mpRunsDone ?? 0)
 
   const weeklyState = await db.weeklyState.upsert({
     where: {
@@ -132,15 +159,17 @@ export async function POST(_req: Request, { params }: Params) {
     create: {
       characterId:   id,
       weekStart,
-      mpRunsDone,
+      mpRunsDone:    finalMpRunsDone,
       mpHighestKey,
+      mpTopKeys,
       raidBossesDone,
       delvesDone:    finalDelvesDone,
       tasksDone:     '[]',
     },
     update: {
-      mpRunsDone,
+      mpRunsDone:    finalMpRunsDone,
       mpHighestKey,
+      mpTopKeys,
       raidBossesDone,
       delvesDone: finalDelvesDone,
     },
@@ -149,4 +178,8 @@ export async function POST(_req: Request, { params }: Params) {
   const updatedCharacter = await db.character.findUnique({ where: { id } })
 
   return NextResponse.json({ character: updatedCharacter, weeklyState, mythic })
+  } catch (err) {
+    console.error('[sync] unexpected error:', err)
+    return NextResponse.json({ error: String(err) }, { status: 500 })
+  }
 }

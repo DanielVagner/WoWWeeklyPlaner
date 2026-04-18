@@ -89,6 +89,7 @@ model WeeklyState {
   weekStart      DateTime // Každé úterý 07:00 UTC (WoW reset)
   mpRunsDone     Int      @default(0)
   mpHighestKey   Int      @default(0)
+  mpTopKeys      String   @default("[]") // JSON int[] – sorted desc, used for per-slot vault ilvl
   raidBossesDone Int      @default(0)
   delvesDone     Int      @default(0)
   tasksDone      String   @default("[]") // JSON array – SQLite nemá native array

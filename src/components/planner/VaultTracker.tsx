@@ -42,7 +42,7 @@ function VaultColumnCard({ col, accentColor }: { col: VaultColumn; accentColor: 
           <VaultSlot
             key={i}
             filled={i < col.slots}
-            ilvl={i < col.slots ? col.rewardIlvl : null}
+            ilvl={i < col.slots ? (col.slotIlvls[i] ?? col.rewardIlvl) : null}
             color={accentColor}
           />
         ))}

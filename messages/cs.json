@@ -58,6 +58,10 @@
       "allUnlocked":  "Všechny sloty odemčeny ✓",
       "progress":     "{done}/{threshold} – chybí {missing}"
     },
+    "mp": {
+      "sectionTitle": "Mythic+ runy tento týden",
+      "highestKey":   "Nejvyšší klíč: +{key}"
+    },
     "delves": {
       "sectionTitle": "Tier 8+ Delves tento týden"
     },

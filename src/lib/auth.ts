@@ -54,6 +54,25 @@ export const authOptions: NextAuthOptions = {
     }),
   },
 
+  events: {
+    // NextAuth does NOT update access_token on re-login for existing accounts.
+    // We do it manually here so the stored token is always fresh.
+    async signIn({ account }) {
+      if (account?.provider === 'battlenet' && account.access_token) {
+        await db.account.updateMany({
+          where: {
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+          },
+          data: {
+            access_token: account.access_token,
+            expires_at:   account.expires_at ?? null,
+          },
+        })
+      }
+    },
+  },
+
   pages: {
     signIn: '/',
     error: '/',

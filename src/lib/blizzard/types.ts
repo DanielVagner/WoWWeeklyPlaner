@@ -86,6 +86,19 @@ export interface RaidEncountersResponse {
   }>
 }
 
+// ─── Raider.IO ───────────────────────────────────────────────────────────────
+
+export interface RaiderIOWeeklyRun {
+  dungeon: string
+  mythic_level: number
+  completed_at: string
+  score: number
+}
+
+export interface RaiderIOProfileResponse {
+  mythic_plus_weekly_highest_level_runs?: RaiderIOWeeklyRun[]
+}
+
 // Blizzard returns delve activity through the character encounters/delves endpoint.
 // Each entry represents a delve map with weekly runs per tier.
 export interface DelveRun {

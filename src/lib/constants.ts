@@ -11,8 +11,8 @@ export const SEASON_CONFIG = {
 
 export const VAULT_THRESHOLDS = {
   mp:    [1, 4, 8] as const,
-  raid:  [3, 6, 9] as const,
-  delve: [1, 4, 8] as const,
+  raid:  [2, 4, 6] as const,
+  delve: [2, 4, 8] as const,
 } as const
 
 // ─── WoW class colors ─────────────────────────────────────────────────────────
@@ -39,13 +39,13 @@ export function getClassColor(className: string): string {
 
 // ─── Vault ilvl dle nejvyššího M+ klíče ──────────────────────────────────────
 
-export function mpVaultIlvl(highestKey: number): number {
-  if (highestKey >= 13) return 629
-  if (highestKey >= 12) return 628
-  if (highestKey >= 11) return 626
-  if (highestKey >= 10) return 625
-  if (highestKey >= 9)  return 622
-  if (highestKey >= 8)  return 619
-  if (highestKey >= 7)  return 616
-  return 613
+// Great Vault M+ reward ilvl per key level (Midnight Season 1)
+export function mpVaultIlvl(keyLevel: number): number {
+  if (keyLevel <= 0)  return 0
+  if (keyLevel >= 10) return 266
+  if (keyLevel >= 8)  return 263
+  if (keyLevel >= 6)  return 259
+  if (keyLevel >= 5)  return 256
+  if (keyLevel >= 4)  return 253
+  return 250  // key 1–3
 }

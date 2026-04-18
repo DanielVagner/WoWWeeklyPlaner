@@ -3,6 +3,7 @@ import type {
   BlizzardCharacter,
   CharacterDelvesResponse,
   MythicKeystoneProfile,
+  RaiderIOProfileResponse,
   RaidEncountersResponse,
 } from './types'
 
@@ -150,6 +151,24 @@ export async function fetchCharacterDelves(
     accessToken,
     { namespace: `profile-${REGION}` }
   )
+}
+
+// ─── Raider.IO (no auth, public API) ─────────────────────────────────────────
+
+export async function fetchRaiderIOWeeklyRuns(
+  region: string,
+  realm: string,
+  name: string,
+): Promise<RaiderIOProfileResponse> {
+  const url = new URL('https://raider.io/api/v1/characters/profile')
+  url.searchParams.set('region', region)
+  url.searchParams.set('realm', realm)
+  url.searchParams.set('name', name.toLowerCase())
+  url.searchParams.set('fields', 'mythic_plus_weekly_highest_level_runs')
+
+  const res = await fetch(url.toString(), { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Raider.IO API ${res.status}: ${realm}/${name}`)
+  return res.json() as Promise<RaiderIOProfileResponse>
 }
 
 // ─── Game Data API (client credentials) ──────────────────────────────────────

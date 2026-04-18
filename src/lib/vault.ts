@@ -34,16 +34,27 @@ export interface VaultColumn {
   slots: number
   thresholds: readonly number[]
   rewardIlvl: number | null
+  /** M+ only: ilvl for each unlocked slot (slot 1 = highest key, slot 2 = 4th, slot 3 = 8th) */
+  slotIlvls: (number | null)[]
   missingForNext: number
 }
+
+const parseKeys = (raw: string): number[] => { try { return JSON.parse(raw) } catch { return [] } }
 
 export function buildVaultState(
   mpRunsDone: number,
   mpHighestKey: number,
+  mpTopKeys: string,
   raidBossesDone: number,
   delvesDone: number
 ): { mp: VaultColumn; raid: VaultColumn; delve: VaultColumn } {
-  const mpIlvl = mpHighestKey > 0 ? mpVaultIlvl(mpHighestKey) : null
+  // M+ vault rewards: slot1 = highest key, slot2 = 4th highest, slot3 = 8th highest
+  const keys      = parseKeys(mpTopKeys)
+  const slotIlvls: (number | null)[] = [
+    keys[0] != null ? mpVaultIlvl(keys[0]) : (mpHighestKey > 0 ? mpVaultIlvl(mpHighestKey) : null),
+    keys[3] != null ? mpVaultIlvl(keys[3]) : null,
+    keys[7] != null ? mpVaultIlvl(keys[7]) : null,
+  ]
 
   return {
     mp: {
@@ -52,7 +63,8 @@ export function buildVaultState(
       done:           mpRunsDone,
       slots:          completedSlots(mpRunsDone, VAULT_THRESHOLDS.mp),
       thresholds:     VAULT_THRESHOLDS.mp,
-      rewardIlvl:     mpIlvl,
+      rewardIlvl:     slotIlvls[0],
+      slotIlvls,
       missingForNext: missingForNextSlot(mpRunsDone, VAULT_THRESHOLDS.mp),
     },
     raid: {
@@ -61,7 +73,8 @@ export function buildVaultState(
       done:           raidBossesDone,
       slots:          completedSlots(raidBossesDone, VAULT_THRESHOLDS.raid),
       thresholds:     VAULT_THRESHOLDS.raid,
-      rewardIlvl:     623,
+      rewardIlvl:     263,
+      slotIlvls:      [263, 263, 263],
       missingForNext: missingForNextSlot(raidBossesDone, VAULT_THRESHOLDS.raid),
     },
     delve: {
@@ -70,7 +83,8 @@ export function buildVaultState(
       done:           delvesDone,
       slots:          completedSlots(delvesDone, VAULT_THRESHOLDS.delve),
       thresholds:     VAULT_THRESHOLDS.delve,
-      rewardIlvl:     616,
+      rewardIlvl:     250,
+      slotIlvls:      [250, 250, 250],
       missingForNext: missingForNextSlot(delvesDone, VAULT_THRESHOLDS.delve),
     },
   }
